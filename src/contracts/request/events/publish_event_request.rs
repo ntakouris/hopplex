@@ -1,25 +1,27 @@
-use std::option::{Option};
 use serde::{Deserialize};
 
 #[derive(Deserialize, Debug)]
-pub struct EventPayload<T>{
-    pub key: String,
-    pub tag: Option<String>,
-    pub value: Option<T>
+pub struct CaptionedImage {
+    pub caption: String,
+    pub contents_b64: String
 }
+
 
 #[derive(Deserialize, Debug)]
 #[serde(untagged)]
 pub enum EventValue {
-    String(EventPayload<String>),
-    Float(EventPayload<f32>),
-    Int(EventPayload<i32>),
-    Bool(EventPayload<bool>)
+    String(String),
+    Float(f32),
+    Int(i32),
+    Bool(bool),
+    CaptionedImage(CaptionedImage)
 }
 
 #[derive(Deserialize, Debug)]
 pub struct PublishSingleValueEventRequest {
-    pub source_id: String,
+    // whatever other metadata you need
+    pub id: String,
+    // flattening is optional, but we don't want to wrap 2 times
     #[serde(flatten)]
-    pub manifest: EventValue
+    pub value: EventValue
 }
