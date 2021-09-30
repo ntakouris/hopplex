@@ -18,7 +18,7 @@ use db::db::DB;
 use db::in_memory::InMemoryDB;
 
 #[post("/publish_event", format="application/json", data="<request>")]
-pub fn publish_event(request: Json<PublishSingleValueEventRequest>, db: State<Box<dyn DB>>) -> Result<(), String> {
+pub fn publish_event(request: Json<PublishSingleValueEventRequest>, db: &State<Box<dyn DB>>) -> Result<(), String> {
     let event = request.0;
 
     println!("{:?}", event.value);
@@ -52,7 +52,7 @@ pub fn publish_event(request: Json<PublishSingleValueEventRequest>, db: State<Bo
 }
 
 #[get("/retrieve_event/<id>")]
-pub fn retrieve_event(id: String, db: State<Box<dyn DB>>) -> Result<Json<DataResourcePayload>, Option<String>> {
+pub fn retrieve_event(id: String, db: &State<Box<dyn DB>>) -> Result<Json<DataResourcePayload>, Option<String>> {
     match db.retrieve(id) {
         Ok(c) => match c {
             Some(x) => Result::Ok(Json(x.value)),

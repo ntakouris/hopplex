@@ -6,11 +6,11 @@ use super::super::model::resource::DataResource;
 
 // warning: not thread safe
 pub struct InMemoryDB {
-    map: HashMap<String, DataResource>
+    pub map: HashMap<String, DataResource>
 }
 
 impl DB for InMemoryDB {
-    fn save(&self, id: String, resource: DataResource) -> Result<(), String> {
+    fn save(&mut self, id: String, resource: DataResource) -> Result<(), String> {
         self.map.insert(id, resource);
         return Result::Ok(());
     }

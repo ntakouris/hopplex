@@ -5,6 +5,6 @@ use super::super::model::resource::DataResource;
 
 pub trait DB: Send + Sync{
     // fill out your own `Err` types
-    fn save(&self, id: String, resource: DataResource) -> Result<(), String>;
+    fn save(&mut self, id: String, resource: DataResource) -> Result<(), String>;
     fn retrieve(&self, id: String) -> Result<Option<&DataResource>, String>;
 }
