@@ -3,5 +3,8 @@ content-type: application/json
 
 {
     "id": "a",
-    "value": 5
+    "value": {
+        "caption": "abcdef",
+        "contents_b64": "0000000000000"
+    }
 }

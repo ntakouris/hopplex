@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct CaptionedImage {
+pub struct CaptionedImageValue {
     pub caption: String,
     pub contents_b64: String
 }
@@ -14,11 +14,11 @@ pub enum EventValue {
     Float(f32),
     Int(i32),
     Bool(bool),
-    CaptionedImage(CaptionedImage)
+    CaptionedImage(CaptionedImageValue)
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct PublishSingleValueEventRequest {
+pub struct EventEntity {
     // whatever other metadata you need
     pub id: String,
     // flattening is optional, but we don't want to wrap 2 times

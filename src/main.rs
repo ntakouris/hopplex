@@ -5,7 +5,7 @@ use rocket::serde::json::Json;
 use rocket::State;
 
 mod contracts;
-use contracts::request::events::publish_event_request::{PublishSingleValueEventRequest, EventValue};
+use contracts::events::{CaptionedImageValue, EventValue, EventEntity};
 
 mod model;
 use model::resource::{DataResource, DataResourcePayload, CaptionedImagePayload};
@@ -15,10 +15,10 @@ use db::db::DB;
 use db::in_memory::InMemoryDB;
 
 #[post("/publish_event", format="application/json", data="<request>")]
-pub fn publish_event(request: Json<PublishSingleValueEventRequest>, db: &State<Box<dyn DB>>) -> Result<(), String> {
+pub fn publish_event(request: Json<EventEntity>, db: &State<Box<dyn DB>>) -> Result<(), String> {
     let event = request.0;
 
-    println!("{:?}", event);
+    /* map EventEntity -> DataResource */
 
     // alternatively, return a mutable DataResource
     // and map the id and other metadata afterwards
@@ -29,8 +29,7 @@ pub fn publish_event(request: Json<PublishSingleValueEventRequest>, db: &State<B
         EventValue::Bool(x) => DataResource{ id: event.id, value: DataResourcePayload::Bool(x)},
 
         EventValue::CaptionedImage(x) => {
-            // assume this connects to some blob storage service to store the image and receive a key back
-            println!("Saving image b64 encoded: {} to blob storage", x.contents_b64);
+            // save to blob storage
             let ref_id = Uuid::new_v4().to_string();
 
             DataResource { 
@@ -49,12 +48,33 @@ pub fn publish_event(request: Json<PublishSingleValueEventRequest>, db: &State<B
 }
 
 #[get("/retrieve_event/<id>")]
-pub fn retrieve_event(id: String, db: &State<Box<dyn DB>>) -> Result<Json<DataResource>, Option<String>> {
+pub fn retrieve_event(id: String, db: &State<Box<dyn DB>>) -> Result<Json<EventEntity>, Option<String>> {
     match db.retrieve(&id) {
         Ok(c) => match c {
-            Some(x) => {
-                println!("{:?}", x);
-                Result::Ok(Json(x))
+            Some(d) => {
+                /* map DataResource -> EventEntity */
+                let ret = match d.value {
+                    DataResourcePayload::String(x) => EventEntity{ id: d.id, value: EventValue::String(x)},
+                    DataResourcePayload::Float(x) => EventEntity{ id: d.id, value: EventValue::Float(x)},
+                    DataResourcePayload::Int(x) => EventEntity{ id: d.id, value: EventValue::Int(x)},
+                    DataResourcePayload::Bool(x) => EventEntity{ id: d.id, value: EventValue::Bool(x)},
+                    DataResourcePayload::CaptionedImage(x) => {
+                        // fetch from blob storage
+                        let img_b64 = "<get from blob storage>".into();
+
+                        EventEntity { 
+                            id: d.id, 
+                            value: EventValue::CaptionedImage(
+                                CaptionedImageValue {
+                                    caption: x.caption,
+                                    contents_b64: img_b64
+                                }
+                            )
+                        }
+                    }
+                };
+
+                Result::Ok(Json(ret))
             },
             None => Result::Err(None)
         },

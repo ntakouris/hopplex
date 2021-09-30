@@ -26,6 +26,5 @@ pub struct DataResource {
     pub id: String,
 
     // flattening is optional, but we don't want to box 2 times
-    #[serde(flatten)]
     pub value: DataResourcePayload
 }
