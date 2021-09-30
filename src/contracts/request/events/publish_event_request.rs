@@ -1,13 +1,13 @@
-use serde::{Deserialize};
+use serde::{Serialize, Deserialize};
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CaptionedImage {
     pub caption: String,
     pub contents_b64: String
 }
 
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
 pub enum EventValue {
     String(String),
@@ -17,11 +17,10 @@ pub enum EventValue {
     CaptionedImage(CaptionedImage)
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct PublishSingleValueEventRequest {
     // whatever other metadata you need
     pub id: String,
     // flattening is optional, but we don't want to wrap 2 times
-    #[serde(flatten)]
     pub value: EventValue
 }
