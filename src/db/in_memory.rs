@@ -10,12 +10,17 @@ pub struct InMemoryDB {
 }
 
 impl DB for InMemoryDB {
-    fn save(&mut self, id: String, resource: DataResource) -> Result<(), String> {
-        self.map.insert(id, resource);
+    fn save(&mut self, resource: DataResource) -> Result<(), String> {
+        self.map.insert(resource.id.clone(), resource);
         return Result::Ok(());
     }
 
-    fn retrieve(&self, id: String) -> Result<Option<&DataResource>, String> {
-        return Result::Ok(self.map.get(&id));
+    fn retrieve(self, id: &String) -> Result<Option<DataResource>, String> {
+        let referenced = self.map.get(id);
+        
+        return match referenced {
+            Some(x) => Result::Ok(Some(x.clone())),
+            None => Result::Err("No entry found".into())
+        };
     }
 }

@@ -1,17 +1,17 @@
 use serde::{Serialize, Deserialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct CaptionedImagePayload {
     pub caption: String,
     pub blob_storage_ref_id: String 
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct PrimitiveValuePayload<T> {
     pub value: T
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum DataResourcePayload {
     String(String),
     Float(f32),
@@ -20,7 +20,7 @@ pub enum DataResourcePayload {
     CaptionedImage(CaptionedImagePayload)
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct DataResource {
     // whatever other metadata you need
     pub id: String,
