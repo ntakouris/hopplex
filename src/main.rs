@@ -1,5 +1,8 @@
 use std::collections::HashMap;
 
+use std::cell::RefCell;
+use std::sync::{Arc, Mutex};
+
 use uuid::Uuid;
 
 #[macro_use] extern crate rocket;
@@ -17,7 +20,7 @@ use db::db::DB;
 use db::in_memory::InMemoryDB;
 
 #[post("/publish_event", format="application/json", data="<request>")]
-pub fn publish_event(request: Json<PublishSingleValueEventRequest>, db: &State<&Box<dyn DB>>) -> Result<(), String> {
+pub fn publish_event(request: Json<PublishSingleValueEventRequest>, db: &State<Box<dyn DB>>) -> Result<(), String> {
     let event = request.0;
 
     println!("{:?}", event.value);
@@ -51,7 +54,7 @@ pub fn publish_event(request: Json<PublishSingleValueEventRequest>, db: &State<&
 }
 
 #[get("/retrieve_event/<id>")]
-pub fn retrieve_event(id: String, db: &State<&Box<dyn DB>>) -> Result<Json<DataResourcePayload>, Option<String>> {
+pub fn retrieve_event(id: String, db: &State<Box<dyn DB>>) -> Result<Json<DataResourcePayload>, Option<String>> {
     match db.retrieve(&id) {
         Ok(c) => match c {
             Some(x) => Result::Ok(Json(x.value)),
@@ -63,7 +66,12 @@ pub fn retrieve_event(id: String, db: &State<&Box<dyn DB>>) -> Result<Json<DataR
 
 #[launch]
 fn rocket() -> _ {
-    let db_inst = Box::new(InMemoryDB{ map: HashMap::new()}) as Box<dyn DB>;
+    let temp: HashMap<String, DataResource> = HashMap::new();
+    let db_inst = Box::new(InMemoryDB{
+        map: Arc::new(
+                 Mutex::new(
+                     RefCell::new(
+                          temp )))}) as Box<dyn DB>;
 
     rocket::build()
         .manage(db_inst)
