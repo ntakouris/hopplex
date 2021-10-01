@@ -6,7 +6,6 @@ pub struct CaptionedImageValue {
     pub contents_b64: String
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
 pub enum EventValue {
